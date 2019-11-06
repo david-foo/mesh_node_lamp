@@ -103,7 +103,7 @@ static void generic_level_get(struct bt_mesh_model *model, struct bt_mesh_msg_ct
 	bt_mesh_model_msg_init(&msg, BT_MESH_MODEL_OP_GENERIC_LEVEL_STATUS);
 	net_buf_simple_add_le16(&msg, current);
 	net_buf_simple_add_le16(&msg, target);
-	net_buf_simple_add_u8(&msg, time2tt(remaining_time));
+	net_buf_simple_add_u8(&msg, remaining_time);
 
 	if (bt_mesh_model_send(model, ctx, &msg, NULL, NULL)) {
 		printk("Unable to send level Status response\n");
@@ -135,12 +135,14 @@ static void generic_level_set_unack(struct bt_mesh_model *model, struct bt_mesh_
 	last_message_dst = ctx->recv_dst;
 	last_message_tid = tid;
 
+	printk("target_level_state=%d  buflen=%d\n", target_level_state, buflen);
 
 	if (buflen > 3) {// with delay and transition time
-		if (target_level_state > 0) {
+		if (target_level_state >= 0) {
 			u8_t tt = net_buf_simple_pull_u8(buf);
 			u8_t delay = net_buf_simple_pull_u8(buf);
 			transform_set_level(target_level_state, delay*5, tt2time(tt));
+			printk("tt=%x,delay=%d\n", tt, delay);
 		}
 	} else {// without delay and transition time
 		transform_set_level(target_level_state, 0, 1);
