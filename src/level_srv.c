@@ -182,13 +182,11 @@ static void generic_delta_set_unack(struct bt_mesh_model *model, struct bt_mesh_
 	last_message_dst = ctx->recv_dst;
 	last_message_tid = tid;
 
-
+	printk("target_level_state=%d  buflen=%d\n", target_level_state, buflen);
 	if (buflen > 5) {// with delay and transition time
-		if (target_level_state > 0) {
-			u8_t tt = net_buf_simple_pull_u8(buf);
-			u8_t delay = net_buf_simple_pull_u8(buf);
-			transform_set_delta((s16_t)(target_level_state), delay*5, tt2time(tt));
-		}
+		u8_t tt = net_buf_simple_pull_u8(buf);
+		u8_t delay = net_buf_simple_pull_u8(buf);
+		transform_set_delta((s16_t)(target_level_state), delay*5, tt2time(tt));
 	} else {// without delay and transition time
 		transform_set_delta((s16_t)(target_level_state), 0, 1);
 	}

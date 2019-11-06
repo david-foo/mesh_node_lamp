@@ -255,10 +255,11 @@ static void transform_start(s8_t start, s8_t end, s32_t delay, s32_t period)
 }
 
 // set absolutely level, period can not be 0
-s32_t transform_set_level(s16_t end, s32_t delay, s32_t period)
+s32_t transform_set_level(s16_t end, s32_t delay, s32_t trans_time)
 {
 	s8_t start = mb_led.current_step;
 	s8_t end_lv = LED_LEVEL_2_STEP(end);
+	s32_t period;
 
 	if (end_lv < 0){
 		end_lv = 0;
@@ -267,6 +268,7 @@ s32_t transform_set_level(s16_t end, s32_t delay, s32_t period)
 		end_lv = 25;
 	}
 
+	period = trans_time / (int)abs(end_lv - start);
 	transform_start(start, end_lv, delay, period);
 
 	// return remaining time
@@ -274,19 +276,21 @@ s32_t transform_set_level(s16_t end, s32_t delay, s32_t period)
 }
 
 // set level continously within a time, period can not be 0
-s32_t transform_set_delta(s16_t delta, s32_t delay, s32_t period)
+s32_t transform_set_delta(s16_t delta, s32_t delay, s32_t trans_time)
 {
 	s8_t start = mb_led.current_step;
-	s8_t end =  start + LED_LEVEL_2_STEP(delta);
+	s8_t end_lv =  start + LED_LEVEL_2_STEP(delta);
+	s32_t period;
 
-	if (end < 0){
-		end = 0;
-	} else if (end >25)
+	if (end_lv < 0){
+		end_lv = 0;
+	} else if (end_lv >25)
 	{
-		end = 25;
+		end_lv = 25;
 	}
 
-	transform_start(start, end, delay, period);
+	period = trans_time / (int)abs(end_lv - start);
+	transform_start(start, end_lv, delay, period);
 
 	// return remaining time
 	return (int)abs(mb_led.current_step - mb_led.end)*period;
