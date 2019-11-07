@@ -196,21 +196,46 @@ static void generic_delta_set(struct bt_mesh_model *model, struct bt_mesh_msg_ct
 	generic_level_get(model, ctx, buf);
 }
 
-static void generic_move_set(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
-{
-
-}
-
 static void generic_move_set_unack(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
 {
+	printk("generic_delta_set_unack\n");
+	u8_t buflen = buf->len;
+	//  Delta(2), TID(1), Transition Time(optional, 1), Delay (conditional, 1)
+	s16_t target_level_state = (s16_t)net_buf_simple_pull_le32(buf);
 
+	// The TID field is a transaction identifier indicating whether the message is a new message or a retransmission of a previously sent message
+	u8_t tid = net_buf_simple_pull_u8(buf);
+
+	// set the Generic Level state to the Level field of the message, unless the message has the same values for the SRC, DST, and TID fields as the
+	// previous message received within the last 6 seconds.
+
+	s64_t now = k_uptime_get(); // elapsed time since the system booted, in milliseconds.
+	if (ctx->addr == last_message_src && ctx->recv_dst == last_message_dst && tid == last_message_tid && (now - last_message_timestamp <= 6000))
+	{
+		printk("Ignoring message - same transaction during 6 second window\n");
+		return;
+	}
+
+	last_message_timestamp = now;
+	last_message_src = ctx->addr;
+	last_message_dst = ctx->recv_dst;
+	last_message_tid = tid;
+
+	printk("target_level_state=%d  buflen=%d\n", target_level_state, buflen);
+	if (buflen > 3) {// with delay and transition time
+		u8_t tt = net_buf_simple_pull_u8(buf);
+		u8_t delay = net_buf_simple_pull_u8(buf);
+		transform_set_move((s16_t)(target_level_state), delay*5, tt2time(tt));
+	} else {// without delay and transition time
+		transform_set_move((s16_t)(target_level_state), 0, 1);
+	}
 }
 
-void generic_level_status(struct bt_mesh_model *model)
+static void generic_move_set(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
 {
-
+	generic_move_set_unack(model, ctx, buf);
+	generic_level_get(model, ctx, buf);
 }
-
 
 const struct bt_mesh_model_op gen_level_srv_op[] = {
 	{BT_MESH_MODEL_OP_2(0x82, 0x05), 0, generic_level_get},

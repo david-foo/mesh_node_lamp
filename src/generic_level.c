@@ -307,6 +307,27 @@ s32_t transform_set_delta(s16_t delta, s32_t delay, s32_t trans_time)
 	return (int)abs(mb_led.current_step - mb_led.end)*period;
 }
 
+// set level continously move within a time
+s32_t transform_set_move(s16_t delta, s32_t delay, s32_t trans_time)
+{
+	s8_t start = mb_led.current_step;
+	s8_t end_lv =  start + LED_LEVEL_2_STEP((s32_t)delta * 1000 / trans_time);
+	s32_t period;
+
+	if (end_lv < 0){
+		end_lv = 0;
+	} else if (end_lv >25)
+	{
+		end_lv = 25;
+	}
+
+	period = trans_time / (int)abs(end_lv - start);
+	transform_start(start, end_lv, delay, period);
+
+	// return remaining time
+	return (int)abs(mb_led.current_step - mb_led.end)*period;
+}
+
 s16_t transform_get_current(void)
 {
 	return LED_STEP_2_LEVEL(mb_led.current_step) - LED_SHIFT_POS;
