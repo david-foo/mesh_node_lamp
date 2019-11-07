@@ -34,14 +34,16 @@ void button_a_work_handler(struct k_work *work)
 {
 	printk("button_a_work_handler\n");
 
-	transform_set_level(32767, 0, 100);
+	//transform_set_level(32767, 0, 100);
+	transform_set_delta(6552, 0, 300);
 }
 
 void button_b_work_handler(struct k_work *work)
 {
 	printk("button_b_work_handler\n");
 
-	transform_set_level(0, 0, 100);
+	//transform_set_level(-32768, 0, 100);
+	transform_set_delta(-6552, 0, 300);
 }
 
 void button_a_pressed(struct device *gpiob, struct gpio_callback *cb,

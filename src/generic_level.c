@@ -16,10 +16,10 @@
 
 
 #define LED_STEPS    (25)
-#define LEVEL_FULL   (32767)
+#define LEVEL_FULL   (65535)
 #define LED_STEP_PER_VALUE  (LEVEL_FULL/LED_STEPS)
 #define LED_LEVEL_2_STEP(level)  (level/LED_STEP_PER_VALUE)
-
+#define LED_SHIFT_POS (32768)
 #define LED_STEP_2_LEVEL(step) (step * LED_STEP_PER_VALUE)
 
 // micro:bit display patterns for OFF and ON
@@ -268,7 +268,8 @@ static void transform_start(s8_t start, s8_t end, s32_t delay, s32_t period)
 s32_t transform_set_level(s16_t end, s32_t delay, s32_t trans_time)
 {
 	s8_t start = mb_led.current_step;
-	s8_t end_lv = LED_LEVEL_2_STEP(end);
+	s32_t end_t = end + LED_SHIFT_POS;//shift to positive
+	s8_t end_lv = LED_LEVEL_2_STEP(end_t);
 	s32_t period;
 
 	if (end_lv < 0){
@@ -308,12 +309,12 @@ s32_t transform_set_delta(s16_t delta, s32_t delay, s32_t trans_time)
 
 s16_t transform_get_current(void)
 {
-	return LED_STEP_2_LEVEL(mb_led.current_step);
+	return LED_STEP_2_LEVEL(mb_led.current_step) - LED_SHIFT_POS;
 }
 
 s16_t transform_get_target(void)
 {
-	return LED_STEP_2_LEVEL(mb_led.end);
+	return LED_STEP_2_LEVEL(mb_led.end) - LED_SHIFT_POS;
 }
 
 s32_t transform_get_remain(void)

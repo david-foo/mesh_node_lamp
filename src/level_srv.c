@@ -138,12 +138,10 @@ static void generic_level_set_unack(struct bt_mesh_model *model, struct bt_mesh_
 	printk("target_level_state=%d  buflen=%d\n", target_level_state, buflen);
 
 	if (buflen > 3) {// with delay and transition time
-		if (target_level_state >= 0) {
-			u8_t tt = net_buf_simple_pull_u8(buf);
-			u8_t delay = net_buf_simple_pull_u8(buf);
-			transform_set_level(target_level_state, delay*5, tt2time(tt));
-			printk("tt=%x,delay=%d\n", tt, delay);
-		}
+		u8_t tt = net_buf_simple_pull_u8(buf);
+		u8_t delay = net_buf_simple_pull_u8(buf);
+		transform_set_level(target_level_state, delay*5, tt2time(tt));
+		printk("tt=%x,delay=%d\n", tt, delay);
 	} else {// without delay and transition time
 		transform_set_level(target_level_state, 0, 1);
 	}
