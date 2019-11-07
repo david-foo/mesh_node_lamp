@@ -246,11 +246,21 @@ static void transform_start(s8_t start, s8_t end, s32_t delay, s32_t period)
 	if (start == end)
 		return;
 
-	mb_led.start = start;
-	mb_led.end = end;
-	mb_led.current_step = start;
-	mb_led.period = period;
-	mb_led.delay = delay;
+	if (period ==0) {
+		mb_led.start = start;
+		mb_led.end = end;
+		mb_led.current_step = end;
+		mb_led.period = period;
+		mb_led.delay = delay;
+		mb_led_set(end);// set led immediately
+		return;
+	} else {
+		mb_led.start = start;
+		mb_led.end = end;
+		mb_led.current_step = start;
+		mb_led.period = period;
+		mb_led.delay = delay;
+	}
 	k_timer_start(&level_timer, delay , period);
 }
 
