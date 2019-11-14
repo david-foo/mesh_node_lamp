@@ -32,7 +32,7 @@ static struct k_work button_b_work;
 
 void button_a_work_handler(struct k_work *work)
 {
-	printk("button_a_work_handler\n");
+	//printk("button_a_work_handler\n");
 
 	//transform_set_level(32767, 0, 100);
 	//transform_set_delta(6552, 0, 300);
@@ -41,7 +41,7 @@ void button_a_work_handler(struct k_work *work)
 
 void button_b_work_handler(struct k_work *work)
 {
-	printk("button_b_work_handler\n");
+	//printk("button_b_work_handler\n");
 
 	//transform_set_level(-32768, 0, 100);
 	//transform_set_delta(-6552, 0, 300);
@@ -118,7 +118,6 @@ void board_output_number(bt_mesh_output_action_t action, u32_t number)
 
 	oob_number = number;
 
-	printk("level client OOB %d\n",oob_number);
 	mb_display_print(disp, MB_DISPLAY_MODE_DEFAULT, K_SECONDS(2),
 				"%04u", oob_number);
 }

@@ -108,6 +108,11 @@ static void generic_level_get(struct bt_mesh_model *model, struct bt_mesh_msg_ct
 	if (bt_mesh_model_send(model, ctx, &msg, NULL, NULL)) {
 		printk("Unable to send level Status response\n");
 	}
+
+	printk("Level server model of element(%04x) send new states"
+		"to: %04x with present_state: %d target_state:%d remaining_time:%d\n",
+		bt_mesh_model_elem(model)->addr, ctx->addr, current,
+		target,remaining_time);
 }
 
 static void generic_level_set_unack(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
@@ -192,13 +197,14 @@ static void generic_delta_set_unack(struct bt_mesh_model *model, struct bt_mesh_
 
 static void generic_delta_set(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
 {
+	printk("generic_delta_set\n");
 	generic_delta_set_unack(model, ctx, buf);
 	generic_level_get(model, ctx, buf);
 }
 
 static void generic_move_set_unack(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
 {
-	printk("generic_delta_set_unack\n");
+	printk("generic_move_set_unack\n");
 	u8_t buflen = buf->len;
 	//  Delta(2), TID(1), Transition Time(optional, 1), Delay (conditional, 1)
 	s16_t target_level_state = (s16_t)net_buf_simple_pull_le32(buf);
@@ -233,6 +239,7 @@ static void generic_move_set_unack(struct bt_mesh_model *model, struct bt_mesh_m
 
 static void generic_move_set(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
 {
+	printk("generic_move_set\n");
 	generic_move_set_unack(model, ctx, buf);
 	generic_level_get(model, ctx, buf);
 }

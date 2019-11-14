@@ -123,7 +123,7 @@ void main(void)
 {
 	int err;
 
-	printk("Initializing...\n");
+	printk("Lamp Initializing...\n");
 
 	level_srv_init();
 	board_init();
