@@ -207,7 +207,7 @@ static void generic_move_set_unack(struct bt_mesh_model *model, struct bt_mesh_m
 	printk("generic_move_set_unack\n");
 	u8_t buflen = buf->len;
 	//  Delta(2), TID(1), Transition Time(optional, 1), Delay (conditional, 1)
-	s16_t target_level_state = (s16_t)net_buf_simple_pull_le32(buf);
+	s16_t target_level_state = (s16_t)net_buf_simple_pull_le16(buf);
 
 	// The TID field is a transaction identifier indicating whether the message is a new message or a retransmission of a previously sent message
 	u8_t tid = net_buf_simple_pull_u8(buf);
@@ -231,9 +231,9 @@ static void generic_move_set_unack(struct bt_mesh_model *model, struct bt_mesh_m
 	if (buflen > 3) {// with delay and transition time
 		u8_t tt = net_buf_simple_pull_u8(buf);
 		u8_t delay = net_buf_simple_pull_u8(buf);
-		transform_set_move((s16_t)(target_level_state), delay*5, tt2time(tt));
+		transform_set_move(target_level_state, delay*5, tt2time(tt));
 	} else {// without delay and transition time
-		transform_set_move((s16_t)(target_level_state), 0, 1);
+		transform_set_move(target_level_state, 0, 1);
 	}
 }
 
