@@ -51,6 +51,7 @@ void button_b_work_handler(struct k_work *work)
 void button_a_pressed(struct device *gpiob, struct gpio_callback *cb,
 											u32_t pins)
 {
+	struct mb_display *disp = mb_display_get();
 	time = k_uptime_get_32();
 
 	if(time < last_time + BUTTON_DEBOUNCE_DELAY_MS) {
@@ -60,8 +61,11 @@ void button_a_pressed(struct device *gpiob, struct gpio_callback *cb,
 
 	last_time = time;
 
-	if(!is_prov_completed)
+	if(!is_prov_completed) {
+		mb_display_print(disp, MB_DISPLAY_MODE_DEFAULT, K_MSEC(500),
+						"%04u", oob_number);
 		return;
+	}
 
 	k_work_submit(&button_a_work);
 }
@@ -118,7 +122,7 @@ void board_output_number(bt_mesh_output_action_t action, u32_t number)
 
 	oob_number = number;
 
-	mb_display_print(disp, MB_DISPLAY_MODE_DEFAULT, K_SECONDS(2),
+	mb_display_print(disp, MB_DISPLAY_MODE_DEFAULT, K_SECONDS(1),
 				"%04u", oob_number);
 }
 
