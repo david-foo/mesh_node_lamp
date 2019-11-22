@@ -13,6 +13,7 @@
 
 #include "board.h"
 #include "generic_level.h"
+#include "level_srv.h"
 
 
 #define LED_STEPS    (25)
@@ -238,6 +239,7 @@ static void stoped_handler(struct k_timer *dummy)
 {
 	printk("stoped_handler\n");
 	// pub final status
+	generic_level_pub();
 }
 
 K_TIMER_DEFINE(level_timer, expire_handler, stoped_handler);
@@ -245,6 +247,9 @@ static void transform_start(s8_t start, s8_t end, s32_t delay, s32_t period)
 {
 	if (start == end)
 		return;
+
+// pub initial status
+	generic_level_pub();
 
 	if (period ==0) {
 		mb_led.start = start;

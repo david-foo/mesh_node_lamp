@@ -90,6 +90,35 @@ static u32_t tt2time(u8_t tt)
 	return hours * 3600000 + minutes * 60000 + secs * 1000 + msecs;
 }
 
+void generic_level_pub(void)
+{
+	s16_t current, target;
+	u8_t remaining_time;
+	int err;
+
+	struct bt_mesh_model *model = &root_models[2];
+
+	if (!model->pub->addr)
+		return;
+
+	current = transform_get_current();
+	target = transform_get_target();
+	remaining_time = time2tt(transform_get_remain());
+
+	struct net_buf_simple *msg = model->pub->msg;
+
+	bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_GENERIC_LEVEL_STATUS);
+	net_buf_simple_add_le16(msg, current);
+	net_buf_simple_add_le16(msg, target);
+	net_buf_simple_add_u8(msg, remaining_time);
+
+	err = bt_mesh_model_publish(model);
+	if (err) {
+		printk("bt_mesh_model_publish err %d\n", err);
+		return;
+	}
+}
+
 static void generic_level_get(struct bt_mesh_model *model, struct bt_mesh_msg_ctx *ctx, struct net_buf_simple *buf)
 {
 	s16_t current, target;

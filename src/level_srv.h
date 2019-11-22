@@ -15,7 +15,7 @@ extern const struct bt_mesh_model_op gen_level_srv_op[];
 
 
 extern void level_srv_init();
-
+extern void generic_level_pub(void);
 
 
 #endif
