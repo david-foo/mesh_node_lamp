@@ -111,6 +111,7 @@ static void bt_ready(int err)
 
 	if (IS_ENABLED(CONFIG_SETTINGS)) {
 		settings_load();
+		generic_level_pub();
 	}
 
 	/* This will be a no-op if settings_load() loaded provisioning info */
